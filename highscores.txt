@@ -1,0 +1,5 @@
+Daria,10
+Dina,20
+Kira,0
+Don,0
+GG,0
