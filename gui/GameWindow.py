@@ -3,6 +3,9 @@ from PyQt5.QtWidgets import QMainWindow, QLabel, QGridLayout, QInputDialog, QMes
 from PyQt5.QtGui import QPainter, QPixmap, QPen, QColor
 from PyQt5.QtCore import Qt
 
+from gui.HighscoreWindow import HighscoreWindow
+from gui.strategy.BigBallDrawStrategy import BigBallDrawStrategy
+from gui.strategy.SmallBallDrawStrategy import SmallBallDrawStrategy
 from models.Ball import Ball
 from game_logic.Game import Game
 from game_logic.GameService import GameService
@@ -90,19 +93,22 @@ class GameWindow(QMainWindow):
         print("Drawing balls...")
         canvas_size = self.CANVAS_SIZE
         game_size = self.game.size
-        size = int(canvas_size / game_size)
+        cell_size = int(canvas_size / game_size)
         painter = QPainter(self.label.pixmap())
+
+        big_strategy = BigBallDrawStrategy()
+        small_strategy = SmallBallDrawStrategy()
 
         for key, ball in self.game.area.items():
             if isinstance(ball, Ball):
                 painter.setBrush(QColor(*ball.color.value))
+                x, y = key[1] * cell_size, key[0] * cell_size
 
-                x, y = key[1] * size, key[0] * size
-                if ball.size == Size.big:
-                    painter.drawEllipse(x, y, size, size)
-                else:
-                    half_size = size // 2
-                    painter.drawEllipse(x + size // 4, y + size // 4, half_size, half_size)
+                strategy = big_strategy if ball.size == Size.big else small_strategy
+                strategy.draw(painter, ball, x, y, cell_size)
+
+        painter.end()
+        self.update()
 
     def mousePressEvent(self, event):
         if self.game:
@@ -132,15 +138,10 @@ class GameWindow(QMainWindow):
             self.points.setText("You lose: " + str(self.game.points))
             self.show_game_over_dialog()
 
-    def show_highscores(self, filename="highscores.txt"):
-        highscores = GameService.load_highscores(filename)
-        highscores.sort(key=lambda x: x[1], reverse=True)
-        scores_text = "\n".join([f"{name}: {points}" for name, points in highscores])
-        QMessageBox.information(self, "Highscores", scores_text)
-
     def show_game_over_dialog(self):
         name, ok = QInputDialog.getText(self, "Highscore", "Enter your name:")
         if ok and name:
             GameService.save_highscore(name, self.game.points)
-            self.show_highscores()
-            QMessageBox.information(self, "\033[92mGame Over", "Thank you for playing! Your score has been saved\033[0m")
+            highscore_window = HighscoreWindow(self)
+            highscore_window.exec_()
+            QMessageBox.information(self, "Game Over", "Thank you for playing! Your score has been saved")

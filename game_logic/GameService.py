@@ -1,6 +1,6 @@
 import collections
 
-from .Game import Game
+from game_logic import Game
 from models.Ball import Ball
 from models.Size import Size
 
@@ -194,8 +194,17 @@ class GameService:
     def load_highscores(filename="highscores.txt"):
         try:
             with open(filename, "r") as file:
-                scores = [line.strip().split(",") for line in file]
-                return [(name, int(points)) for name, points in scores]
+                highscores = []
+                for line in file:
+                    parts = line.strip().split(",")
+                    if len(parts) == 2:
+                        name, points = parts
+                        try:
+                            points = int(points)
+                            highscores.append((name, points))
+                        except ValueError:
+                            continue
+                return highscores
         except FileNotFoundError:
             return []
 

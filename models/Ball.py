@@ -1,5 +1,5 @@
-from .Size import Size
-from .Color import Color
+from models import Size
+from models import Color
 
 class Ball:
 
