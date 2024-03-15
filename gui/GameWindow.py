@@ -18,7 +18,7 @@ class GameWindow(QMainWindow):
     CANVAS_SIZE = 720
     CANVAS_WIDTH = 745
     CANVAS_HEIGHT = 980
-    FIXED_SIZE = 100
+    FIXED_SIZE = 200
     CELL_BORDER_WIDTH = 3
     SELECTED_CELL_COLOR = QColor(153, 154, 153)
     LINE_COLOR = QColor(0, 0, 0)
@@ -30,13 +30,14 @@ class GameWindow(QMainWindow):
         self.game = None
         self.points = QLabel(self)
         self.label = QLabel(self)
+        self.rules_shown = False
         self.init_ui()
 
     def init_ui(self):
         uic.loadUi('Untitled.ui', self)
         self.setWindowTitle("ColorLines98")
 
-        self.pushButton.setFixedSize(self.FIXED_SIZE, self.FIXED_SIZE)
+        self.pushButton.setFixedSize(self.FIXED_SIZE, 100)
         self.pushButton.clicked.connect(self.start_game)
 
         canvas = QPixmap(self.CANVAS_SIZE, self.CANVAS_SIZE)
@@ -44,9 +45,11 @@ class GameWindow(QMainWindow):
         self.label.setPixmap(canvas)
 
         layout = QGridLayout(self.centralwidget)
-        layout.addWidget(self.pushButton, 0, 0, alignment=Qt.AlignCenter)
-        layout.addWidget(self.points, 0, 0, alignment=Qt.AlignLeft)
-        layout.addWidget(self.label, 1, 0)
+
+        layout.addWidget(self.pushButton, 0, 0, 1, 2, alignment=Qt.AlignCenter)
+        layout.addWidget(self.points, 1, 0, alignment=Qt.AlignLeft)
+        layout.addWidget(self.label, 2, 0, 1, 2)
+
         self.setFixedSize(self.CANVAS_WIDTH, self.CANVAS_HEIGHT)
         self.center_window()
 
@@ -57,14 +60,17 @@ class GameWindow(QMainWindow):
         self.move(qr.topLeft())
 
     def start_game(self):
-        rules_window = RulesWindow()
-        rules_window.exec_()
+        print("Starting game with settings:", self.w.count_cells, self.w.count_colors, self.w.count_balls_line, self.w.difficulty)
+        if not self.rules_shown:
+            rules_window = RulesWindow()
+            rules_window.exec_()
+            self.rules_shown = True
         self.initialize_game()
         self.update_ui_for_new_game()
 
     def initialize_game(self):
         print("Initializing game...")
-        self.game = Game(self.w.count_cells, self.w.count_colors, self.w.count_balls_line)
+        self.game = Game(self.w.count_cells, self.w.count_colors, self.w.count_balls_line, self.w)
         print("Game object created successfully:", self.game) if self.game else print("Failed to create game object")
         GameService.start_game(self.game)
 

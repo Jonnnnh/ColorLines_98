@@ -1,17 +1,22 @@
 from data_structures.Graph import Graph
+from gui import SettingsWindow
 from models.Color import Color
 
 class Game:
 
-    def __init__(self, size, count_color: int, count_balls_line: int):
+    def __init__(self, size, count_color: int, count_balls_line: int,  settings_window: SettingsWindow):
+        print("Initializing Game object with size:", size, "count_color:", count_color, "count_balls_line:",
+              count_balls_line)
         self._size = size
         self._count_balls_line = count_balls_line
         self._color = list(Color)[:count_color]
         self._graph = Graph(size ** 2)
+        print("Graph initialized with vertices:", self._graph.vertices)
         self._area = {(i, j): None for i in range(size) for j in range(size)}
         self._choosing_sell = None
         self._initialize_graph_adjacency_lists()
         self._points = 0
+        self.settings_window = settings_window
 
     def _initialize_graph_adjacency_lists(self):
         for key in self._area.keys():

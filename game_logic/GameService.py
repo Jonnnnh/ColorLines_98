@@ -1,5 +1,7 @@
 import collections
 
+from PyQt5.QtWidgets import QMessageBox
+
 from game_logic import Game
 from models.Ball import Ball
 from models.Size import Size
@@ -11,11 +13,15 @@ class GameService:
     @staticmethod
     def start_game(game: Game):
         GameService.populate_balls(game, 5, Size.big)
-        GameService.populate_balls(game, 3, Size.small)
+        new_balls = 5 if game.settings_window.difficulty == 'hard' else 3
+        GameService.populate_balls(game, new_balls, Size.small)
         GameService.rework_graph(game)
 
     @staticmethod
     def populate_balls(game: Game, count: int, size: Size):
+        print(f"Populating balls: count = {count}, size = {size}")
+        empty_cells = game.get_empty_cell()
+        print(f"Empty cells available: {len(empty_cells)}")
         for _ in range(count):
             if len(game.get_empty_cell()) == 0:
                 break
@@ -34,7 +40,9 @@ class GameService:
     def end_move(game: Game):
         GameService.transform_small_balls(game)
         if len(game.get_empty_cell()) > 0:
-            GameService.populate_balls(game, 3, Size.small)
+
+            new_balls = 5 if game.settings_window.difficulty == 'hard' else 3
+            GameService.populate_balls(game, new_balls, Size.small)
         else:
             print("\033[92mGame Over: No space left for new balls\033[0m")
             return
@@ -74,7 +82,8 @@ class GameService:
         elif GameService.is_big_ball(game, cell_end[0], cell_end[1]):
             game.choosing_cell = cell_end
         else:
-            print("\033[91mUnable to move the ball: cell unreachable or blocked\033[0m")
+            QMessageBox.warning(None, "Перемещение невозможно", "Перемещение шара невозможно: путь закрыт или ячейка занята.")
+            print("Unable to move the ball: cell unreachable or blocked")
 
     @staticmethod
     def handle_post_move(game: Game, cell_end: tuple):
@@ -114,6 +123,7 @@ class GameService:
 
     @staticmethod
     def can_move_ball(game: Game, cell_start: tuple, cell_end: tuple):
+        print(f"Checking if can move ball from {cell_start} to {cell_end}")
         if cell_start not in game.area or cell_end not in game.area:
             print("\033[91mError: One of the cells is outside the playing field\033[0m")
             return False
