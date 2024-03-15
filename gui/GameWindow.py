@@ -1,9 +1,10 @@
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow, QLabel, QGridLayout, QInputDialog, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QLabel, QGridLayout, QInputDialog, QMessageBox, QDesktopWidget
 from PyQt5.QtGui import QPainter, QPixmap, QPen, QColor
 from PyQt5.QtCore import Qt
 
 from gui.HighscoreWindow import HighscoreWindow
+from gui.RulesWindow import RulesWindow
 from gui.strategy.BigBallDrawStrategy import BigBallDrawStrategy
 from gui.strategy.SmallBallDrawStrategy import SmallBallDrawStrategy
 from models.Ball import Ball
@@ -12,9 +13,11 @@ from game_logic.GameService import GameService
 from models.Size import Size
 from gui.SettingsWindow import SettingsWindow
 
-class GameWindow(QMainWindow):
 
+class GameWindow(QMainWindow):
     CANVAS_SIZE = 720
+    CANVAS_WIDTH = 745
+    CANVAS_HEIGHT = 980
     FIXED_SIZE = 100
     CELL_BORDER_WIDTH = 3
     SELECTED_CELL_COLOR = QColor(153, 154, 153)
@@ -31,7 +34,7 @@ class GameWindow(QMainWindow):
 
     def init_ui(self):
         uic.loadUi('Untitled.ui', self)
-        self.setWindowTitle("Lines 98")
+        self.setWindowTitle("ColorLines98")
 
         self.pushButton.setFixedSize(self.FIXED_SIZE, self.FIXED_SIZE)
         self.pushButton.clicked.connect(self.start_game)
@@ -44,8 +47,18 @@ class GameWindow(QMainWindow):
         layout.addWidget(self.pushButton, 0, 0, alignment=Qt.AlignCenter)
         layout.addWidget(self.points, 0, 0, alignment=Qt.AlignLeft)
         layout.addWidget(self.label, 1, 0)
+        self.setFixedSize(self.CANVAS_WIDTH, self.CANVAS_HEIGHT)
+        self.center_window()
+
+    def center_window(self):
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
 
     def start_game(self):
+        rules_window = RulesWindow()
+        rules_window.exec_()
         self.initialize_game()
         self.update_ui_for_new_game()
 
@@ -145,3 +158,7 @@ class GameWindow(QMainWindow):
             highscore_window = HighscoreWindow(self)
             highscore_window.exec_()
             QMessageBox.information(self, "Game Over", "Thank you for playing! Your score has been saved")
+
+    def closeEvent(self, event):
+        self.w.close()
+        event.accept()

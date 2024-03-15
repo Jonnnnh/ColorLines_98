@@ -113,24 +113,15 @@ class GameService:
         return deleted
 
     @staticmethod
-    def delete_line(game: Game, balls):
-        if len(balls) >= game.count_balls_line:
-            for ball in balls:
-                game.area[ball] = None
-            game.points = game.points + len(balls) - 1
-            return True
-        return False
-
-    @staticmethod
     def can_move_ball(game: Game, cell_start: tuple, cell_end: tuple):
         if cell_start not in game.area or cell_end not in game.area:
             print("\033[91mError: One of the cells is outside the playing field\033[0m")
             return False
         return not GameService.is_big_ball(game, cell_end[0], cell_end[1]) and \
-            GameService.is_reachable(game, cell_start, cell_end)
+            GameService.is_bfs(game, cell_start, cell_end)
 
     @staticmethod
-    def is_reachable(game: Game, s: tuple, d: tuple):
+    def is_bfs(game: Game, s: tuple, d: tuple):
         visited = {key: False for key in game.area}
         queue = collections.deque([s])
         visited[s] = True
@@ -180,15 +171,6 @@ class GameService:
             cells.append((cell[0], cell[1] + 1))
 
         return cells
-
-    @staticmethod
-    def get_big_ball_cell(game: Game):
-        big_ball_cells = []
-        for key in game.area.keys():
-            if GameService.is_big_ball(game, key[0], key[1]):
-                big_ball_cells.append(key)
-
-        return big_ball_cells
 
     @staticmethod
     def load_highscores(filename="highscores.txt"):

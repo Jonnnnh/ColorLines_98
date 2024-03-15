@@ -22,6 +22,3 @@ class Ball:
     @color.setter
     def color(self, color: Color):
         self._color = color
-
-    def __eq__(self, other) -> bool:
-        return isinstance(other, Ball) and self.size == other.size and self.color == other.color
