@@ -1,5 +1,5 @@
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow, QLabel, QGridLayout, QInputDialog, QMessageBox, QDesktopWidget
+from PyQt5.QtWidgets import QMainWindow, QLabel, QGridLayout, QInputDialog, QMessageBox, QDesktopWidget, QPushButton
 from PyQt5.QtGui import QPainter, QPixmap, QPen, QColor
 from PyQt5.QtCore import Qt
 
@@ -31,10 +31,11 @@ class GameWindow(QMainWindow):
         self.points = QLabel(self)
         self.label = QLabel(self)
         self.rules_shown = False
+        self.showHighscoreButton = None
         self.init_ui()
 
     def init_ui(self):
-        uic.loadUi('Untitled.ui', self)
+        uic.loadUi('untitled.ui', self)
         self.setWindowTitle("ColorLines98")
 
         self.pushButton.setFixedSize(self.FIXED_SIZE, 100)
@@ -45,10 +46,14 @@ class GameWindow(QMainWindow):
         self.label.setPixmap(canvas)
 
         layout = QGridLayout(self.centralwidget)
-
-        layout.addWidget(self.pushButton, 0, 0, 1, 2, alignment=Qt.AlignCenter)
         layout.addWidget(self.points, 1, 0, alignment=Qt.AlignLeft)
         layout.addWidget(self.label, 2, 0, 1, 2)
+
+        self.showHighscoreButton = self.findChild(QPushButton, 'showHighscoreButton')
+        if self.showHighscoreButton:
+            self.showHighscoreButton.clicked.connect(self.show_highscores)
+        else:
+            print("Error: 'showHighscoreButton' not found in the UI file.")
 
         self.setFixedSize(self.CANVAS_WIDTH, self.CANVAS_HEIGHT)
         self.center_window()
@@ -60,7 +65,8 @@ class GameWindow(QMainWindow):
         self.move(qr.topLeft())
 
     def start_game(self):
-        print("Starting game with settings:", self.w.count_cells, self.w.count_colors, self.w.count_balls_line, self.w.difficulty)
+        print("Starting game with settings:", self.w.count_cells, self.w.count_colors, self.w.count_balls_line,
+              self.w.difficulty)
         if not self.rules_shown:
             rules_window = RulesWindow()
             rules_window.exec_()
@@ -77,7 +83,7 @@ class GameWindow(QMainWindow):
     def update_ui_for_new_game(self):
         self.draw_game()
         self.pushButton.setText("Restart")
-        self.points.setText(str(self.game.points))
+        self.scoreLabel.setText(f"Score: {self.game.points}")
 
     def draw_cells(self):
         print("Drawing cells...")
@@ -164,6 +170,10 @@ class GameWindow(QMainWindow):
             highscore_window = HighscoreWindow(self)
             highscore_window.exec_()
             QMessageBox.information(self, "Game Over", "Thank you for playing! Your score has been saved")
+
+    def show_highscores(self):
+        dialog = HighscoreWindow(self)
+        dialog.exec_()
 
     def closeEvent(self, event):
         self.w.close()
