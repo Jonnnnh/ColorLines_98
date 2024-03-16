@@ -44,7 +44,14 @@
                 <property name="text">
                     <string>Start Game</string>
                 </property>
+                <property name="styleSheet">
+                    <string><![CDATA[
+                        border: 1px solid #8f8f91;
+                        border-radius: 2px;
+                    ]]></string>
+                </property>
             </widget>
+
             <widget class="QPushButton" name="showHighscoreButton">
                 <property name="text">
                     <string>Show Highscores</string>
@@ -56,6 +63,26 @@
                         <width>200</width>
                         <height>100</height>
                     </rect>
+                </property>
+                <property name="styleSheet">
+                    <string><![CDATA[
+                        border: 1px solid #8f8f91;
+                        border-radius: 2px;
+                    ]]></string>
+                </property>
+            </widget>
+
+            <widget class="QLabel" name="gameCanvas">
+                <property name="geometry">
+                    <rect>
+                        <x>13</x>
+                        <y>200</y>
+                        <width>720</width>
+                        <height>720</height>
+                    </rect>
+                </property>
+                <property name="styleSheet">
+                    <string notr="true">background-color: #ffffff;</string>
                 </property>
             </widget>
         </widget>

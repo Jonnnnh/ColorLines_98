@@ -1,5 +1,5 @@
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow, QLabel, QGridLayout, QInputDialog, QMessageBox, QDesktopWidget, QPushButton
+from PyQt5.QtWidgets import QMainWindow, QLabel, QGridLayout, QInputDialog, QMessageBox, QDesktopWidget
 from PyQt5.QtGui import QPainter, QPixmap, QPen, QColor
 from PyQt5.QtCore import Qt
 
@@ -49,11 +49,7 @@ class GameWindow(QMainWindow):
         layout.addWidget(self.points, 1, 0, alignment=Qt.AlignLeft)
         layout.addWidget(self.label, 2, 0, 1, 2)
 
-        self.showHighscoreButton = self.findChild(QPushButton, 'showHighscoreButton')
-        if self.showHighscoreButton:
-            self.showHighscoreButton.clicked.connect(self.show_highscores)
-        else:
-            print("Error: 'showHighscoreButton' not found in the UI file.")
+        self.showHighscoreButton.clicked.connect(self.show_highscores)
 
         self.setFixedSize(self.CANVAS_WIDTH, self.CANVAS_HEIGHT)
         self.center_window()
@@ -83,7 +79,7 @@ class GameWindow(QMainWindow):
     def update_ui_for_new_game(self):
         self.draw_game()
         self.pushButton.setText("Restart")
-        self.scoreLabel.setText(f"Score: {self.game.points}")
+        self.scoreLabel.setText("Score: " + str(self.game.points))
 
     def draw_cells(self):
         print("Drawing cells...")
@@ -157,10 +153,10 @@ class GameWindow(QMainWindow):
                 print("\033[91mClick outside of game area\033[0m")
 
     def update_game_status(self):
-        self.points.setText(str(self.game.points))
+        self.scoreLabel.setText("Score: " + str(self.game.points))
         if GameService.is_game_over(self.game):
             print("\033[92mGame over!\033[0m")
-            self.points.setText("You lose: " + str(self.game.points))
+            self.scoreLabel.setText("You lose: " + str(self.game.points))
             self.show_game_over_dialog()
 
     def show_game_over_dialog(self):

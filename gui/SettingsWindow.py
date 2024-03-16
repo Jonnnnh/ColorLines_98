@@ -10,7 +10,7 @@ class SettingsWindow(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        self.setGeometry(0, 0, 400, 200)
+        self.setGeometry(20, 60, 400, 200)
         self.setWindowTitle("Settings")
         layout = QGridLayout(self)
 
