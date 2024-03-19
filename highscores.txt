@@ -12,3 +12,4 @@ Marina,5
 hhhhhhh,0
 Kir,0
 uuuuu,15
+Fif,32

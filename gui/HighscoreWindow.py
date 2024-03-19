@@ -1,7 +1,7 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QDialog, QTableWidget, QTableWidgetItem, QPushButton
 
-from game_logic.GameService import GameService
+from game_logic.GameLogic import GameService
 
 
 class HighscoreWindow(QDialog):

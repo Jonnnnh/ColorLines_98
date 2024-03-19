@@ -1,7 +1,5 @@
 import collections
 
-from PyQt5.QtWidgets import QMessageBox
-
 from game_logic import Game
 from models.Ball import Ball
 from models.Size import Size
@@ -33,8 +31,10 @@ class GameService:
         if cell not in game.area:
             print("\033[91mError: The selected cell is outside the playing field\033[0m")
             return
-        if GameService.is_big_ball(game, cell[0], cell[1]):
+        if cell in game.area and game.area[cell] is not None:
             game.choosing_cell = cell
+            return True
+        return False
 
     @staticmethod
     def end_move(game: Game):
@@ -67,23 +67,23 @@ class GameService:
     @staticmethod
     def move(game: Game, cell: tuple):
         if game.choosing_cell:
-            GameService.move_ball(game, game.choosing_cell, cell)
+            return GameService.move_ball(game, game.choosing_cell, cell)
         else:
-            GameService.choose_cell(game, cell)
+            return GameService.choose_cell(game, cell)
 
     @staticmethod
-    def move_ball(game: Game, cell_start: tuple, cell_end: tuple):
+    def move_ball(game: Game, cell_start: tuple, cell_end: tuple) -> bool:
         if game.area.get(cell_start) is None:
             print("\033[91mError: There is no ball to move in the start cell\033[0m")
-            return
+            return False
         if GameService.can_move_ball(game, cell_start, cell_end):
             game.area[cell_end], game.area[cell_start] = game.area[cell_start], None
             GameService.handle_post_move(game, cell_end)
+            return True
         elif GameService.is_big_ball(game, cell_end[0], cell_end[1]):
             game.choosing_cell = cell_end
-        else:
-            QMessageBox.warning(None, "Перемещение невозможно", "Перемещение шара невозможно: путь закрыт или ячейка занята.")
-            print("Unable to move the ball: cell unreachable or blocked")
+            return True
+        return False
 
     @staticmethod
     def handle_post_move(game: Game, cell_end: tuple):

@@ -9,7 +9,7 @@ from gui.strategy.BigBallDrawStrategy import BigBallDrawStrategy
 from gui.strategy.SmallBallDrawStrategy import SmallBallDrawStrategy
 from models.Ball import Ball
 from game_logic.Game import Game
-from game_logic.GameService import GameService
+from game_logic.GameLogic import GameService
 from models.Size import Size
 from gui.SettingsWindow import SettingsWindow
 
@@ -134,21 +134,22 @@ class GameWindow(QMainWindow):
     def mousePressEvent(self, event):
         if self.game:
             print("Mouse pressed...")
-
             click_x = event.x() - self.label.x()
             click_y = event.y() - self.label.y()
-
             cell_size = self.CANVAS_SIZE / self.game.size
 
             if 0 <= click_x <= self.CANVAS_SIZE and 0 <= click_y <= self.CANVAS_SIZE:
-
                 cell_x = int(click_x // cell_size)
                 cell_y = int(click_y // cell_size)
                 print("\033[94mSelected cell:\033[0m", (cell_y, cell_x))
 
-                GameService.move(self.game, (cell_y, cell_x))
-                self.draw_game()
-                self.update_game_status()
+                success = GameService.move(self.game,(cell_y, cell_x))
+                if not success:
+                    QMessageBox.warning(self, "Moving is impossible",
+                                        "The ball cannot be moved: the path is closed or the cell is occupied")
+                else:
+                    self.draw_game()
+                    self.update_game_status()
             else:
                 print("\033[91mClick outside of game area\033[0m")
 
