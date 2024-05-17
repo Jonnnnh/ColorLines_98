@@ -1,6 +1,6 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow, QLabel, QGridLayout, QInputDialog, QMessageBox, QDesktopWidget
-from PyQt5.QtGui import QPainter, QPixmap, QPen, QColor
+from PyQt5.QtGui import QPainter, QPixmap, QPen, QColor, QRadialGradient
 from PyQt5.QtCore import Qt
 
 from gui.HighscoreWindow import HighscoreWindow
@@ -20,12 +20,15 @@ class GameWindow(QMainWindow):
     CANVAS_HEIGHT = 980
     FIXED_SIZE = 200
     CELL_BORDER_WIDTH = 3
-    SELECTED_CELL_COLOR = QColor(153, 154, 153)
+    SELECTED_CELL_COLOR = QColor(42, 130, 218)
     LINE_COLOR = QColor(0, 0, 0)
-    BACKGROUND_COLOR = QColor(255, 255, 255)
+    BACKGROUND_COLOR = QColor(53, 53, 53)
 
     def __init__(self, w: SettingsWindow):
         super().__init__()
+        self.centralwidget = None
+        self.pushButton = None
+        self.scoreLabel = None
         self.w = w
         self.game = None
         self.points = QLabel(self)
@@ -124,6 +127,13 @@ class GameWindow(QMainWindow):
             if isinstance(ball, Ball):
                 painter.setBrush(QColor(*ball.color.value))
                 x, y = key[1] * cell_size, key[0] * cell_size
+
+                gradient = QRadialGradient(x + cell_size / 2, y + cell_size / 2, cell_size / 2, x + cell_size / 3,
+                                           y + cell_size / 3)
+                gradient.setColorAt(0, QColor(*ball.color.value).lighter(150))
+                gradient.setColorAt(1, QColor(*ball.color.value))
+
+                painter.setBrush(gradient)
 
                 strategy = big_strategy if ball.size == Size.big else small_strategy
                 strategy.draw(painter, ball, x, y, cell_size)
